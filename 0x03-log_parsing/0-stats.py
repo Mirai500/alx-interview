@@ -1,37 +1,43 @@
 #!/usr/bin/python3
-'''a script that reads stdin line by line and computes metrics'''
+"""
+This script prints the metric stats at interval
+"""
 
 
-import sys
+def print_metric(dic, total_size):
+    """
+    Print function
+    """
+    d = sorted(dic.keys())
+    print("File size: {:d}".format(total_size))
+    for i in d:
+        if dic[i] != 0:
+            print("{}: {:d}".format(i, dic[i]))
 
-cache = {'200': 0, '301': 0, '400': 0, '401': 0,
-         '403': 0, '404': 0, '405': 0, '500': 0}
+c = 0
 total_size = 0
-counter = 0
+dic = {"200": 0, "301": 0, "400": 0, "401": 0,
+       "403": 0, "404": 0, "405": 0, "500": 0}
 
 try:
-    for line in sys.stdin:
-        line_list = line.split(" ")
-        if len(line_list) > 4:
-            code = line_list[-2]
-            size = int(line_list[-1])
-            if code in cache.keys():
-                cache[code] += 1
-            total_size += size
-            counter += 1
+    with open(0) as file:
+        for line in file:
+            c += 1
+            arr = line.split()
+            try:
+                total_size += int(arr[-1])
+            except:
+                pass
+            try:
+                status = arr[-2]
+                if status in dic:
+                    dic[status] += 1
+            except:
+                pass
+            if c % 10 == 0:
+                print_metric(dic, total_size)
+        print_metric(dic, total_size)
 
-        if counter == 10:
-            counter = 0
-            print('File size: {}'.format(total_size))
-            for key, value in sorted(cache.items()):
-                if value != 0:
-                    print('{}: {}'.format(key, value))
-
-except Exception as err:
-    pass
-
-finally:
-    print('File size: {}'.format(total_size))
-    for key, value in sorted(cache.items()):
-        if value != 0:
-            print('{}: {}'.format(key, value))
+except KeyboardInterrupt:
+    print_metric(dic, total_size)
+    raise
